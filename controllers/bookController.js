@@ -30,8 +30,17 @@ var bookController = function(Book){
                     res.status(500).send(err);
                     console.log(chalk.red(err));
                 }
-                else
-                    res.json(books);
+                else{
+                    var returnBooks = []; // new empty array
+                    books.forEach(function(element, index, array) {
+                        var newBook = element.toJSON();
+                        newBook.links ={};
+                        newBook.links.self = 'http://'+req.headers.host + '/api/books/'+newBook._id;
+                        returnBooks.push(newBook);
+
+                    });
+                    res.json(returnBooks);
+                }
             })
 
         };

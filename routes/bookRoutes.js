@@ -30,9 +30,13 @@ var routes = function(Book){
     // get one
     apiRoutes.route('/:bookId')
         .get(function(req,res){
+            var returnBook = req.book.toJSON();
+            returnBook.links = {};
+            var newLink = 'http://'+req.headers.host + '/api/books/?genre='+returnBook.genre;
 
+            returnBook.links.FilterByThisGenre = newLink.replace(' ', '%20');
             // using findbook middleware
-            res.json(req.book);
+            res.json(returnBook);
         })
         .put(function(req,res){
             
