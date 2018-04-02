@@ -1,6 +1,7 @@
 var express = require('express');
 var chalk = require('chalk');
 var mongoose = require('mongoose');
+var bodyParser = require('body-parser');
 
 /*
     - Reference express
@@ -9,13 +10,10 @@ var mongoose = require('mongoose');
     - setup a route for root with a callback function to execute some log message
     - start a listener for express app on port 
 */
-
-
 var db = mongoose.connect('mongodb://localhost/bookapi');
 var Book = require('./models/bookModel');
 
 var app = express();
-
 var port = process.env.PORT || 3000;
 
 app.get('/', function(req, res){
@@ -28,44 +26,12 @@ app.get('/', function(req, res){
 
     setup all routes then use app.use router 
 */
-var apiRoutes = express.Router();
 
-//get all
-apiRoutes.route('/Books')
-    .get(function(req,res){
-        
-        var queryString = req.query;
-        var query = {};
-        if(queryString.genre)
-            query.genre = queryString.genre;
+app.use(bodyParser.json()); // parse json object and add it to req.body
+app.use(bodyParser.urlencoded({extended:true})); //
 
-        Book.find(query, function(err, books){
-            if(err){
-                res.status(500).send(err);
-                console.log(chalk.red(err));
-            }
-            else
-                res.json(books);
-        })
-
-    });
-
-    // get one
-apiRoutes.route('/Books/:bookId')
-    .get(function(req,res){
-        
-        Book.findById(req.params.bookId, function(err, book){
-            if(err){
-                res.status(500).send(err);
-                console.log(chalk.red(err));
-            }
-            else
-                res.json(book);
-        })
-
-    });
-
-app.use('/api', apiRoutes);
+bookRouter = require('./routes/bookRoutes.js')(Book); // instantiate book router
+app.use('/api/books', bookRouter);
 
 
 // cmd: node app.js will fireup server listening on port 3000
