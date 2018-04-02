@@ -4,34 +4,12 @@ var chalk = require('chalk');
 var routes = function(Book){
     var apiRoutes = express.Router();
 
+    var bookController = require('../controllers/bookController')(Book);
+
     //get all
     apiRoutes.route('/')
-        .post(function(req,res){
-            var book = new Book(req.body);
-
-            book.save();
-            console.log(chalk.blue(book));
-
-            res.status(201).send(book); // 201 created
-
-        })
-        .get(function(req,res){
-            
-            var queryString = req.query;
-            var query = {};
-            if(queryString.genre)
-                query.genre = queryString.genre;
-
-            Book.find(query, function(err, books){
-                if(err){
-                    res.status(500).send(err);
-                    console.log(chalk.red(err));
-                }
-                else
-                    res.json(books);
-            })
-
-        });
+        .post(bookController.post)
+        .get(bookController.get);
 
     // creating middleware 
     apiRoutes.use('/:bookId', function(req,res,next){

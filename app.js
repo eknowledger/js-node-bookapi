@@ -10,7 +10,13 @@ var bodyParser = require('body-parser');
     - setup a route for root with a callback function to execute some log message
     - start a listener for express app on port 
 */
-var db = mongoose.connect('mongodb://localhost/bookapi');
+var db;
+
+if(process.env.ENV == 'Test') // gulp task test will setup ENV env var to test, this will route to new test db
+        db= mongoose.connect('mongodb://localhost/bookapi_test');
+    else 
+        db= mongoose.connect('mongodb://localhost/bookapi');
+    
 var Book = require('./models/bookModel');
 
 var app = express();
@@ -38,3 +44,5 @@ app.use('/api/books', bookRouter);
 app.listen(port, function(){
     console.log(chalk.green('Gulp is running book apis on PORT: ' + port));
 });
+
+module.exports = app;

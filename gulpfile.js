@@ -1,6 +1,8 @@
 // gulp is required
 // gulp-nodemon plugin is required
 
+// $ npm install supertest gulp-env --save-dev
+
 /*
     command line: gulp
     [16:32:34] Using gulpfile ..\gulpfile.js
@@ -13,7 +15,10 @@
 */
 var gulp = require('gulp'),
     nodemon = require('gulp-nodemon'),
-    chalk = require('chalk');
+    chalk = require('chalk'),
+    gulpMocha = require('gulp-mocha'),
+    env = require('gulp-env'),
+    supertest = require('supertest');
 
     // chalk ref https://github.com/chalk/chalk
 
@@ -35,4 +40,12 @@ gulp.task('default', function(){
     .on('restart', function(){          //listener to restart event, when app is restarted
         console.log(chalk.magenta('app restarted!'));
     })
-})
+});
+
+gulp.task("test", function(){
+
+    // setup test env using gulp-env package
+    env({vars: {ENV:'Test'}}); 
+    gulp.src('tests/*.js', {read:false}) // get all tests from tests dir then run it
+        .pipe(gulpMocha({reporter: 'nyan'})) // gulpMocha needs a reporter to report on test status
+});
